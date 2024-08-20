@@ -1,10 +1,11 @@
 function love.load()
     playerWidth = 10
     playerLength = 50
+    maxY = (love.graphics.getHeight() - 5) - playerLength
 
     -- Player Locations
     playerOneY = 5
-    playerTwoY = (love.graphics.getHeight() - 5) - playerLength
+    playerTwoY = maxY
 
     love.keyboard.setKeyRepeat(true)
 end
@@ -31,15 +32,30 @@ function love.draw()
 end
 
 function love.update(dt)
+    local playerOneNewY
+    local playerTwoNewY
+
     if love.keyboard.isDown('w') then
-        playerOneY = playerOneY - (dt * 120)
+        playerOneNewY = playerOneY - (dt * 120)
+        if playerOneNewY > 5 then
+            playerOneY = playerOneNewY
+        end
     elseif love.keyboard.isDown('s') then
-        playerOneY = playerOneY + (dt * 120)
+        playerOneNewY = playerOneY + (dt * 120)
+        if playerOneNewY < maxY then
+            playerOneY = playerOneNewY
+        end
     end
 
     if love.keyboard.isDown('up') then
-        playerTwoY = playerTwoY - (dt * 120)
+        playerTwoNewY = playerTwoY - (dt * 120)
+        if playerTwoNewY > 5 then
+            playerTwoY = playerTwoNewY
+        end
     elseif love.keyboard.isDown('down') then
-        playerTwoY = playerTwoY + (dt * 120)
+        playerTwoNewY = playerTwoY + (dt * 120)
+        if playerTwoNewY < maxY then
+            playerTwoY = playerTwoNewY
+        end
     end
 end
