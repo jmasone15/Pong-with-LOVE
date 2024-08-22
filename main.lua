@@ -7,9 +7,12 @@ function love.load()
     -- Game Properties
     playerWidth = 10
     playerLength = 50
-    playerSpeed = 200
-    ballSpeed = 1
+    playerSpeed = 250
+    ballSpeed = 1.5
+    countdownTimer = 3
+    extraTimer = 0
     debugMode = true
+    gameStart = false
     maxY = (screenHeight - padding) - playerLength
 
     -- Player Location
@@ -17,53 +20,59 @@ function love.load()
     playerTwoY = maxY
 
     function resetBall()
+        gameStart = true
         ballX = screenWidth / 2
         ballY = screenHeight / 2
         ballXDirection = 'right'
         ballYDirection = 'down'
     end
 
-    resetBall()
-
 end
 
 function love.draw()
     -- Debug
     if debugMode then
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.print('ballX: ' ..ballX, 300, 60)
-        love.graphics.print('ballY: ' ..ballY, 300, 80)
-        love.graphics.print('ballXDirection: ' ..ballXDirection, 300, 100)
-        love.graphics.print('ballYDirection: ' ..ballYDirection, 300, 120)
+        if gameStart then
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print('ballX: ' ..ballX, 300, 60)
+            love.graphics.print('ballY: ' ..ballY, 300, 80)
+            love.graphics.print('ballXDirection: ' ..ballXDirection, 300, 100)
+            love.graphics.print('ballYDirection: ' ..ballYDirection, 300, 120)
+        end
     end
 
-    -- Player One
     love.graphics.setColor(255, 255, 255)
-    love.graphics.rectangle(
-        'fill', 
-        5, 
-        playerOneY, 
-        playerWidth, 
-        playerLength
-    )
 
-    -- Player Two
-    love.graphics.rectangle(
-        'fill',
-        (screenWidth - padding) - playerWidth,
-        playerTwoY,
-        playerWidth,
-        playerLength
-    )
+    if gameStart then
+        -- Player One
+        love.graphics.rectangle(
+            'fill', 
+            5, 
+            playerOneY, 
+            playerWidth, 
+            playerLength
+        )
 
-    -- Ball
-    love.graphics.rectangle(
-        'fill',
-        ballX,
-        ballY,
-        10,
-        10
-    )
+        -- Player Two
+        love.graphics.rectangle(
+            'fill',
+            (screenWidth - padding) - playerWidth,
+            playerTwoY,
+            playerWidth,
+            playerLength
+        )
+
+        -- Ball
+        love.graphics.rectangle(
+            'fill',
+            ballX,
+            ballY,
+            10,
+            10
+        )
+    else
+        love.graphics.print(countdownTimer, (screenWidth / 2) - 10, screenHeight / 2)
+    end
 end
 
 function love.update(dt)
@@ -71,6 +80,23 @@ function love.update(dt)
     local playerTwoNewY
     local newBallX
     local newBallY
+
+    -- Countdown
+    if not gameStart then
+        extraTimer = extraTimer + dt
+        if extraTimer >= 1 then
+            if countdownTimer == 1 then
+                countdownTimer = 'Start!'
+            elseif countdownTimer == 'Start!' then
+                resetBall()
+            else 
+                countdownTimer = countdownTimer - 1
+            end
+            extraTimer = 0
+        end
+        return
+    end
+
 
     -- Player One Movement
     if love.keyboard.isDown('w') then
