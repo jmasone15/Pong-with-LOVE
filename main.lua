@@ -8,7 +8,6 @@ function love.load()
     playerWidth = 10
     playerLength = 50
     playerSpeed = 250
-    ballSpeed = 1.5
     countdownTimer = 3
     extraTimer = 0
     debugMode = true
@@ -19,14 +18,25 @@ function love.load()
     playerOneY = padding
     playerTwoY = maxY
 
-    function resetBall()
-        gameStart = true
-        ballX = screenWidth / 2
-        ballY = screenHeight / 2
-        ballXDirection = 'right'
-        ballYDirection = 'down'
+    function coinFlip(T, F)
+        num = math.floor(love.math.random() * 100)
+        if num < 50 then return T else return F end
     end
 
+    function resetBall(isInitial)
+        ballX = screenWidth / 2
+        ballY = screenHeight / 2
+        ballSpeed = 0
+
+        if isInitial then
+            gameStart = true
+            ballXDirection = 'right'
+            ballYDirection = 'down'
+        else 
+            ballXDirection = coinFlip('left', 'right')
+            ballYDirection = coinFlip('up', 'down')
+        end
+    end
 end
 
 function love.draw()
@@ -34,6 +44,7 @@ function love.draw()
     if debugMode then
         if gameStart then
             love.graphics.setColor(1, 1, 1)
+            love.graphics.print('ballSpeed: ' ..ballSpeed, 300, 40)
             love.graphics.print('ballX: ' ..ballX, 300, 60)
             love.graphics.print('ballY: ' ..ballY, 300, 80)
             love.graphics.print('ballXDirection: ' ..ballXDirection, 300, 100)
@@ -88,13 +99,17 @@ function love.update(dt)
             if countdownTimer == 1 then
                 countdownTimer = 'Start!'
             elseif countdownTimer == 'Start!' then
-                resetBall()
+                resetBall(true)
             else 
                 countdownTimer = countdownTimer - 1
             end
             extraTimer = 0
         end
         return
+    end
+
+    if ballSpeed < 1.5 then
+        ballSpeed = ballSpeed + 0.005
     end
 
 
@@ -148,11 +163,10 @@ function love.update(dt)
         newBallX = ballX - ballSpeed
         if newBallX < (playerWidth + padding) and ballY >= playerOneY and ballY <= playerOneY + playerLength then
             ballXDirection = 'right'
-            ballX = ballX + ballSpeed
+            ballX = ballX + 1.5
+            ballSpeed = ballSpeed + 0.1
         elseif newBallX < 0 then
-            resetBall()
-            ballXDirection = ''
-            ballYDirection = ''
+            resetBall(false)
         else
             ballX = newBallX
         end
@@ -161,11 +175,10 @@ function love.update(dt)
         
         if newBallX > (screenWidth - playerWidth - 10 - padding) and ballY >= playerTwoY and ballY <= playerTwoY + playerLength then
             ballXDirection = 'left'
-            ballX = ballX - ballSpeed
+            ballX = ballX - 1.5
+            ballSpeed = ballSpeed + 0.1
         elseif newBallX > (screenWidth - 10) then
-            resetBall()
-            ballXDirection = ''
-            ballYDirection = ''
+            resetBall(false)
         else
             ballX = newBallX
         end
