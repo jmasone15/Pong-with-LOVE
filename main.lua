@@ -1,3 +1,7 @@
+-- TODO
+-- Score
+-- Win
+
 function love.load()
     -- Screen Properties
     screenWidth = love.graphics.getWidth()
@@ -12,6 +16,7 @@ function love.load()
     extraTimer = 0
     debugMode = true
     gameStart = false
+    pause = false
     maxY = (screenHeight - padding) - playerLength
 
     -- Player Location
@@ -54,6 +59,10 @@ function love.draw()
 
     love.graphics.setColor(255, 255, 255)
 
+    if pause then
+        love.graphics.print('Paused', (screenWidth / 2) - 40, (screenHeight / 2) - 20, 0, 1.5, 1.5)
+    end
+
     if gameStart then
         -- Player One
         love.graphics.rectangle(
@@ -82,7 +91,7 @@ function love.draw()
             10
         )
     else
-        love.graphics.print(countdownTimer, (screenWidth / 2) - 10, screenHeight / 2)
+        love.graphics.print(countdownTimer, (screenWidth / 2) - 20, (screenHeight / 2) - 20, 0, 2, 2)
     end
 end
 
@@ -91,6 +100,9 @@ function love.update(dt)
     local playerTwoNewY
     local newBallX
     local newBallY
+
+    -- Pause
+    if pause then return end
 
     -- Countdown
     if not gameStart then
@@ -182,5 +194,11 @@ function love.update(dt)
         else
             ballX = newBallX
         end
+    end
+end
+
+function love.keypressed(key)
+    if key == 'escape' and gameStart then
+        pause = not pause
     end
 end
